@@ -1,0 +1,91 @@
+.container tr:hover {background-color:lightgrey;
+  border-left:4px red solid;
+  border-radius:5px;
+  }
+  tr td{
+    /*width:5%;*/
+    padding-left:.1em;
+    text-align: left;
+  }
+.lower{
+  color:grey;
+}
+.container{
+  background:white;
+  margin-top:2em;
+  padding:2em;
+  width:90%;
+  height:90%;
+  border-radius:20px;
+  display:block;
+}
+
+.selector1 {display:inline-block;
+  position:relative;
+  left:30%;
+  padding:.4em;
+  width:25%;
+
+  height:100%;
+  border:1px darkred solid;
+  border-radius:40px 0px 0px 40px;
+  vertical-align: middle;
+  padding-left:10%;
+  margin-bottom:1em;
+}
+#vid{
+  color:darkred;
+}
+#art{
+  color:white;
+}
+.active{
+  color:white;
+  background:darkred;
+}
+.selector2 {display:inline-block;
+  position:relative;
+  left:28%;
+  padding:.4em;
+  width:25%;
+
+  height:100%;
+  border:1px darkred solid;
+  border-radius:0px 40px 40px 0px;
+  vertical-align: middle;
+  padding-left:10%;
+  margin-bottom:1em;
+}
+.select1 {
+  vertical-align:top;
+  display:inline-block;
+  margin:auto;
+}
+#board {
+  background:white;
+  width:20%;
+  padding:3em;
+  margin:2em;
+}
+#score{
+  background:white;
+  width:20%;
+  padding:3em;
+  margin:2em;
+}
+
+#gameboard{
+  margin:2em;
+  padding:2em;
+  border:2px black solid;
+}
+#gameboard td{
+  padding:1em;
+}
+h4 {
+  position:relative;
+  left:2em;
+}
+#reset {
+  color:white;
+}

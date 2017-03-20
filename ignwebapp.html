@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>IGN CodeFoo Front End</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body style="background:black;">
+    <div class="container">
+        <div class="row">
+            <div class='selector1'><a id="vid" href="javascript:showonlyone('videos');">Videos</a></div>
+            <div class="selector2 active"><a id="art" href="javascript:showonlyone('articles');"> Articles</a></div>
+        </div>
+
+        <div class="display" id="articles" style="display: block;">
+            <table id="articletable">
+
+            </table>
+            <a href="javascript:articleCall();" style="color:grey;">See More Articles...</a>
+        </div>
+        <div class="display" id="videos" style="display:none;">
+            <table id="videotable" style="table-layout:fixed;">
+
+            </table>
+            <a href="javascript:videoCall();" style="color:grey;">See More Videos...</a>
+        </div>
+
+    </div>
+</body>
+<script type="text/javascript">
+//In order to load multiple pages of articles/videos we establish these counting variables.
+
+    var vidindnum = 0;
+    var artindnum = 0;
+    var vidnum = 0;
+    var artnum = 0;
+//This function uses our ajax call to the API to get the information we need as well as formate the
+//length of the video to something a bit more readable.
+// It also formates our table slightly with some in line styling and sets up an event listener for a click.
+    function videoCall() {
+
+        function toHHMMSS(number) {
+            var sec_num = parseInt(number, 10);
+            var hours = Math.floor(sec_num / 3600);
+            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+            var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+            if (hours < 10) {
+                hours = "0" + hours;
+            }
+            if (minutes < 10) {
+                minutes = "0" + minutes;
+            }
+            if (seconds < 10) {
+                seconds = "0" + seconds;
+            }
+            return minutes + ':' + seconds;
+        }
+        var vidurl = 'http://ign-apis.herokuapp.com/videos?startIndex=' + vidindnum + '\u0026count=10'
+        $.ajax({
+            method: 'get',
+            url: vidurl,
+            success: function(articles) {
+                console.log(articles);
+                results = articles['data'];
+                $.each(results, function(i, item) {
+                    var d = item.metadata.duration;
+                    d = toHHMMSS(d);
+                    // console.log(d[1]);
+                    var $tr = $('<tr class="vidrow click-able" style="table-layout:fixed">').append(
+                        $('<td>').text((vidnum + 1)),
+                        $('<td>').html("<h4>" + item.metadata.name + "</h4><span class='lower'>" + item.metadata.description + "</span>"),
+                        $('<td>').text(d),
+                        $('<td style="display:none;">').html("<a href='" + item.metadata.url + "'><img src='" + item.thumbnails[1].url + "'></a>")
+                    );
+                    $('#videotable').append($tr);
+                    $tr.on("click", function() {
+                        for (i = 0; i < this.cells.length; i++) {
+                            if (this.cells[i].style.display == "none") {
+                                this.cells[i].style.display = "block"
+                            } else if (this.cells[i].style.display == "block") {
+                                this.cells[i].style.display = "none"
+                            }
+                        }
+                    });
+                    //Bumps up the count by 1 for each number that is pulled so that it will continue to count up
+                    //if the user elects to get more videos.
+                    vidnum += 1;
+                });
+            }
+        }); //end of ajax request
+        //This counter increases to step up the range of videos that are fetched from the ajax called if it's used again.
+        vidindnum += 10
+
+    };
+//Similar to above, this function uses an ajax call to pull the data needed and formates the posted date to something more human readable.
+//It also does some slight formatting as well as sets up a event listener for when items are clicked.
+    function articleCall() {
+        $.ajax({
+            method: 'get',
+            url: 'http://ign-apis.herokuapp.com/articles?startIndex=0\u0026count=10',
+            success: function(articles) {
+                console.log(articles);
+                results = articles['data'];
+                $.each(results, function(i, item) {
+                    var date = item.metadata.publishDate,
+                        values = date.split(/[^0-9]/),
+                        year = parseInt(values[0], 10),
+                        month = parseInt(values[1], 10) - 1,
+                        day = parseInt(values[2], 10),
+                        hours = parseInt(values[3], 10),
+                        minutes = parseInt(values[4], 10),
+                        seconds = parseInt(values[5], 10),
+                        formattedDate;
+                    formattedDate = new Date(year, month, day, hours, minutes, seconds);
+                    var d = formattedDate.toString().match(/^[a-zA-Z]{3} ([a-zA-Z]{3} \d{2} \d{4})/);
+                    // console.log(d[1]);
+                    var $tr = $('<tr>').append(
+                        $('<td>').text((artnum + 1)),
+                        $('<td>').html("<h4>" + item.metadata.headline + "</h4><span class='lower'>" + item.metadata.subHeadline + "</span>"),
+                        $('<td>').text(d[1]),
+                        $('<td style="display:none;">').html("<a href='" + item.metadata.url + "'><img src='" + item.thumbnails[1].url + "'></a>")
+                    );
+                    $('#articletable').append($tr);
+                    $tr.on("click", function() {
+                        for (i = 0; i < this.cells.length; i++) {
+                            if (this.cells[i].style.display == "none") {
+                                this.cells[i].style.display = "block"
+                            } else if (this.cells[i].style.display == "block") {
+                                this.cells[i].style.display = "none"
+                            }
+                        }
+                    });
+                    // console.log($tr.wrap('<p>').html());
+                    artnum += 1;
+                });
+            }
+        }); //end of ajax request
+        artindnum += 10;
+
+    }
+//This function toggles between the two different tables of videos/articles with a quick animation to make it look nice.
+    function showonlyone(thechosenone) {
+        $('.display').each(function(index) {
+            if ($(this).attr("id") == thechosenone) {
+                $(this).show(200);
+            } else {
+                $(this).hide(200);
+            }
+        });
+    }
+//This runs when the page is loaded for the first time, setting up some event listeners on our static controls.
+//It also runs the inital ajax calls via a call back to the functions above.
+    $(document).ready(function() {
+        $("#vid").click(function() {
+            $("#vid").css({
+                'color': 'white'
+            })
+            $("#art").css({
+                'color': 'darkred'
+            })
+            $(".selector1").addClass('active');
+            $(".selector2").removeClass('active');
+        });
+        $("#art").click(function() {
+            $("#art").css({
+                'color': 'white'
+            })
+            $("#vid").css({
+                'color': 'darkred'
+            })
+            $(".selector2").addClass('active');
+            $(".selector1").removeClass('active');
+        });
+
+        articleCall();
+        videoCall();
+
+
+    }); //end of script
+    //I did change a little bit compared to the example, the image contains a link to the actual
+    //page of the article/video page that was pulled from the API. But it still displays the title and discription
+    //once it's displayed. It also makes it so that you can collapse the expanded image easily.
+    //Though one bug I wasn't able to work out was preventing the rest of the table contents from resizing
+    //When the image is displayed.
+</script>
+
+</html>

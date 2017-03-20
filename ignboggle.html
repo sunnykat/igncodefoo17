@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Number Boggle for Code Foo</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="background:black;">
+<h3 style="color:white;">Not quite Boggle!</h3>
+  <div id="board">
+    <table id="gameboard">
+
+    </table>
+  </div>
+  <div id="score">
+
+  </div>
+  <a href="javascript:reset()" id="reset"><button style="background-color:darkblue;">Reset for new results!</button></a>
+
+</body>
+<script type="text/javascript">
+
+// This function is used to populate our table in the HTML layout with the numbers set up in a 3x3 grid.
+// It could be expanded on by changing the amount of numbers input to it as well as the number of times
+// it loops through and the number of spaces it assigns.
+function buildNumbers(randNumbers){
+  //To increase the grid size the number of i is compared to would need to be increased.
+  for (i=0;i<3;i++){
+    var n = i*3
+    var $tr = $('<tr>').append(
+      $('<td>').text(randNumbers[n]),
+      $('<td>').text(randNumbers[n+1]),
+      $('<td>').text(randNumbers[n+2])
+      //Add another Data point here to build up the grid size.
+    );
+    $('#gameboard').append($tr);
+    }
+
+  }
+  // Creates a function to shuffle our array of numbers to be used in our game of boggle.
+  function shuffle(array) {
+    var current = array.length, tempval, random;
+    while (0 !== current) {
+      random = Math.floor(Math.random() * current);
+      current -= 1;
+      tempval = array[current];
+      array[current] = array[random];
+      array[random] = tempval;
+    }
+    return array;
+  }
+//This function calls back to the shuffle function to randomize the numbers in the number array.
+//To extend the size of the grid you'd simply increase the numbers in the number array exponentially.
+//3x3 goes up to 9. 4x4 would go up to 16. Etc.
+function randomNumbers(){
+  var number = [0,1,2,3,4,5,6,7,8,9];
+  var numcount = number.length - 1;
+  number = shuffle(number);
+  return number;
+}
+//This function houses all of our comparisons made to the numbers on the board. Originally, I wrote this program in Python which doesn't
+//have a switch/case function. Using that would increase the readability of the comparisons.
+//But would result in multiple instances of a comparison for the various cases.
+//In orer to increase the scope of the game you'd have to add additional comparisons for the new positions.
+//As well as change the target number on each one.
+function compareBoard (randomNums){
+  var solutions=[];
+  for(i=0;i<9;i++){
+    if (i != 2 && i != 5 && i !=8){
+        if (randomNums[i] + randomNums[i+1] == 9){
+                solutions.push(randomNums[i]+" + "+randomNums[i+1]+" = 9")}}
+        if (i != 2 && i < 5){
+            if (randomNums[i] + randomNums[i+4] == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+4]+" = 9")
+            }}
+        if (i != 0 && i < 6 && i != 3){
+            if (randomNums[i] + randomNums[i+2] == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+2]+" = 9")
+            }}
+        if (i < 6){
+            if (randomNums[i] + randomNums[i+3] == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+3]+" = 9")
+              }}
+        if (i == 2 || i == 5 ){
+            if ((randomNums[i] + randomNums[i-1] + randomNums[i+1]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i-1]+" + "+randomNums[i+1]+" = 9")
+            }}
+        if (i == 0 || i == 3 || i == 6){
+            if ((randomNums[i] + randomNums[i+1] + randomNums[i+2]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+1]+" + "+randomNums[i+2]+" = 9")
+            }}
+        if (i == 3 || i == 6){
+            if ((randomNums[i] + randomNums[i-2] + randomNums[i+2]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i-2]+" + "+randomNums[i+1]+" = 9")
+              }}
+        if (i == 0 || i == 3){
+            if ((randomNums[i] + randomNums[i+4] + randomNums[i+5]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+4]+" + "+randomNums[i+5]+" = 9")
+              }
+            if ((randomNums[i] + randomNums[i+4] + randomNums[i+2]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+4]+" + "+randomNums[i+2]+" = 9")
+              }}
+        if (i == 0){
+            if ((randomNums[i] + randomNums[i+4] + randomNums[i+8]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+4]+" + "+randomNums[i+8]+" = 9")
+              }
+            if ((randomNums[i] + randomNums[i+4] + randomNums[i+6]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+4]+" + "+randomNums[i+6]+" = 9")
+              }}
+        if (i == 2){
+            if ((randomNums[i] + randomNums[i+2] + randomNums[i+4]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+2]+" + "+randomNums[i+4]+" = 9")
+              }
+            if ((randomNums[i] + randomNums[i+2] + randomNums[i+6]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+2]+" + "+randomNums[i+6]+" = 9")
+              }}
+        if (i == 0 || i == 1 || i == 3 || i == 4){
+            if ((randomNums[i] + randomNums[i+1] + randomNums[i+3]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+1]+" + "+randomNums[i+3]+" = 9")
+              }
+            if ((randomNums[i] + randomNums[i+3] + randomNums[i+4]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+3]+" + "+randomNums[i+4]+" = 9")
+              }}
+        if (i != 2 && i < 5){
+            if ((randomNums[i] + randomNums[i+1] + randomNums[i+4]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+1]+" + "+randomNums[i+4]+" = 9")
+            }}
+        if (i == 1 || i == 2){
+            if ((randomNums[i] + randomNums[i+2] + randomNums[i+5]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+2]+" + "+randomNums[i+5]+" = 9")
+            }
+            if ((randomNums[i] + randomNums[i+3] + randomNums[i+5]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+3]+" + "+randomNums[i+5]+" = 9")
+            }}
+        if (i == 1 || i == 2 || i == 4 || i == 5){
+            if ((randomNums[i] + randomNums[i+2] + randomNums[i+3]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+2]+" + "+randomNums[i+3]+" = 9")
+            }}
+        if (i == 2 || i == 5 ){
+            if ((randomNums[i] + randomNums[i+2] + randomNums[i+1]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+2]+" + "+randomNums[i+1]+" = 9")
+            }}
+        if (i == 0 || i == 1 ){
+            if ((randomNums[i] + randomNums[i+3] + randomNums[i+7]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+3]+" + "+randomNums[i+7]+" = 9")
+            }}
+        if (i < 3){
+            if ((randomNums[i] + randomNums[i+3] + randomNums[i+6]) == 9){
+              solutions.push(randomNums[i]+" + "+randomNums[i+3]+" + "+randomNums[i+6]+" = 9")
+            }}
+  }
+  return solutions;
+}
+
+//A quick function that clears the gameboard and results and runs the generation programs again.
+//This provides a new roll without having to refesh the page.
+function reset (){
+  $('#score').html("");
+  $('#gameboard').html("");
+  var rando = randomNumbers();
+  buildNumbers(rando);
+  var score = compareBoard(rando);
+  if (score.length != 0){
+  $.each(score, function(i,item){
+    var ul = $('<ul>').append(
+      $('<li>').text(item)
+    )
+
+  $('#score').append(ul);
+  });
+  } else {
+    $('#score').append("No matches...")
+  }
+}
+
+//This holds the code that will run when the page is loaded to generate and compare our numbers.
+$(document).ready(function(){
+var rando = randomNumbers();
+buildNumbers(rando);
+var score = compareBoard(rando);
+if (score.length != 0){
+$.each(score, function(i,item){
+  var ul = $('<ul>').append(
+    $('<li>').text(item)
+  )
+
+$('#score').append(ul);
+});
+} else {
+  $('#score').append("No matches...")
+}
+
+});
+//It definitely would be possible to get some user input to build out this in a more automated way
+//Though building out the comparisons in this fashion would get mighty complicated the further out in
+//size you get. Certainly not impossible, however!
+</script>
+</html>
